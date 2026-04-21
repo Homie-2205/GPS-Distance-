@@ -3,125 +3,164 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Run Tracker Pro</title>
+    <title>Personalized Run Tracker</title>
     <style>
-        :root { --accent: #00ff88; --bg: #1a1a1a; }
-        body { 
-            font-family: 'Segoe UI', sans-serif; 
-            background: var(--bg); color: white; 
-            margin: 0; display: flex; flex-direction: column; align-items: center; 
-            justify-content: center; height: 100vh; text-align: center;
-        }
-        .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 40px; width: 90%; }
-        .stat-box { background: #333; padding: 20px; border-radius: 15px; border-bottom: 4px solid var(--accent); }
-        .label { font-size: 0.8rem; color: #aaa; text-transform: uppercase; }
-        .value { font-size: 1.8rem; font-weight: bold; margin-top: 5px; }
-        #timer { font-size: 4rem; color: var(--accent); margin-bottom: 30px; font-variant-numeric: tabular-nums; }
-        .controls { display: flex; gap: 15px; }
-        button { 
-            padding: 18px 40px; font-size: 1.2rem; font-weight: bold; border: none; 
-            border-radius: 50px; cursor: pointer; transition: 0.2s; 
-        }
-        #startBtn { background: var(--accent); color: #111; }
-        #stopBtn { background: #ff4444; color: white; display: none; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; padding: 20px; background: #99ff99; color: #333; --accent: #00e600; }
+        .card { background: rgba(255, 255, 255, 0.1); max-width: 400px; margin: 0 auto; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-bottom: 4px solid var(--accent); }
+        .input-group { background: rgba(255, 255, 255, 0.1); margin-bottom: 20px; text-align: left; }
+        input { background: rgba(255, 255, 255, 0.1); width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
+        .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .stat-item { background: rgba(255, 255, 255, 0.1); padding: 15px; border-radius: 10px; }
+        .stat-value { font-size: 1.5em; font-weight: bold; display: block; color: #007bff; }
+        button { width: 100%; padding: 15px; font-size: 1.1em; font-weight: bold; cursor: pointer; border-radius: 8px; border: none; transition: 0.3s; }
+        .start { background: #008000; color: white; }
+        .stop { background: #008000; color: white; }
     </style>
 </head>
 <body>
 
-    <div id="timer">00:00:00</div>
+
+<div class="card">
+    <h2>Solo Fitness Francisco</h2>
+    <div class="input-group">
+    <input type="text" id="userName" placeholder="Pon tu nombre"
+    </div>
+    
+    <!-- User Input for Weight -->
+    <div class="input-group">
+        <label for="weight">Tu Peso (kg):</label>
+        <input type="number" id="weight" value="70" placeholder="Enter weight in kg">
+    </div>
 
     <div class="stats">
-        <div class="stat-box">
-            <div class="label">Distance</div>
-            <div class="value"><span id="distVal">0.00</span> <small>km</small></div>
+        <div class="stat-item">
+            <span class="stat-value" id="distText">0.00</span>
+            <small>KM</small>
         </div>
-        <div class="stat-box">
-            <div class="label">Status</div>
-            <div id="status" class="value" style="font-size: 1rem;">Ready</div>
+        <div class="stat-item">
+            <span class="stat-value" id="calText">0</span>
+            <small>KCAL</small>
+        </div>
+        <div class="stat-item" style="grid-column: span 2;">
+            <span class="stat-value" id="timeText">00:00</span>
+            <small>DURATION</small>
         </div>
     </div>
 
-    <div class="controls">
-        <button id="startBtn" onclick="startRun()">START RUN</button>
-        <button id="stopBtn" onclick="stopRun()">STOP</button>
-    </div>
+    <button onclick="greetMe()" id="mainBtn" class="start">START RUN</button>
+</div>
 
-    <script>
-        let timerInterval, watchId;
-        let startTime, totalDistance = 0, lastCoords = null;
+<script>
+    let isTracking = false;
+    let watchId = null;
+    let distance = 0;
+    let lastPos = null;
+    let startTime = null;
+    let timerId = null;
+   
+    const btn = document.getElementById('mainBtn');
+    const weightInput = document.getElementById('weight');
+    
+    
+    
+     function greetMe() {
+            // 1. Get the value from the input field
+            const name = document.getElementById('userName').value || "Friend";
+            
+            // 2. Create the message
+            
+            
+            const message = `Hola ${name}, Que comience la carrera`;
+            console.log(message);
 
-        const timerDisplay = document.getElementById('timer');
-        const distDisplay = document.getElementById('distVal');
-        const statusDisplay = document.getElementById('status');
-        const startBtn = document.getElementById('startBtn');
-        const stopBtn = document.getElementById('stopBtn');
+            // 3. Create a SpeechSynthesisUtterance object
+            const utterance = new SpeechSynthesisUtterance(message);
 
-        // Haversine formula to calculate distance between two GPS points
-        function getDistance(lat1, lon1, lat2, lon2) {
-            const R = 6371; // Earth radius in km
-            const dLat = (lat2 - lat1) * Math.PI / 180;
-            const dLon = (lon2 - lon1) * Math.PI / 180;
-            const a = Math.sin(dLat/2)**2 + Math.cos(lat1 * Math.PI/180) * Math.cos(lat2 * Math.PI/180) * Math.sin(dLon/2)**2;
-            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            // 4. Optional: Customize the voice (pitch, rate, etc.)
+            utterance.pitch = 1; // Range: 0 to 2
+            utterance.rate = 1;  // Range: 0.1 to 10
+            utterance.volume = 1; // Range: 0 to 1
+
+            // 5. Tell the computer to speak the message
+            window.speechSynthesis.speak(utterance);
+             greetMe = function() {};
+          
         }
+       
 
-        function updateTimer() {
-            const now = Date.now();
-            const diff = new Date(now - startTime);
-            const h = String(Math.floor((now - startTime) / 3600000)).padStart(2, '0');
-            const m = String(diff.getUTCMinutes()).padStart(2, '0');
-            const s = String(diff.getUTCSeconds()).padStart(2, '0');
-            timerDisplay.textContent = `${h}:${m}:${s}`;
+function once(fn) {
+    let called = false;
+    return function(...args) {
+        if (!called) {
+            called = true;
+            return fn.apply(this, args);
         }
+    };
+}
 
-        function startRun() {
-            if (!navigator.geolocation) {
-                alert("GPS not supported on this device.");
-                return;
-            }
+const greetOnce = once(greetMe);
 
+
+       
+
+    // Haversine formula to calculate distance between GPS points
+    function getDistance(lat1, lon1, lat2, lon2) {
+        const R = 6371; // Earth's radius in km
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                  Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                  Math.sin(dLon/2) * Math.sin(dLon/2);
+        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    }
+
+    function updateStats() {
+        const userWeight = parseFloat(weightInput.value) || 70;
+        document.getElementById('distText').innerText = distance.toFixed(2);
+        
+        // Calorie Formula: Distance (km) * Weight (kg) * 1.036
+        const cals = distance * userWeight * 1.036;
+        document.getElementById('calText').innerText = Math.round(cals);
+    }
+
+    btn.addEventListener('click', () => {
+        if (!isTracking) {
+            // Start Logic
+            isTracking = true;
+            btn.innerText = "Stop & Save";
+            btn.className = "stop";
+            weightInput.disabled = true; // Lock weight during run
             startTime = Date.now();
-            totalDistance = 0;
-            lastCoords = null;
-            
-            // UI Update
-            startBtn.style.display = 'none';
-            stopBtn.style.display = 'block';
-            statusDisplay.textContent = "Tracking...";
 
-            // Start Clock
-            timerInterval = setInterval(updateTimer, 1000);
+            // Track GPS
+            watchId = navigator.geolocation.watchPosition(p => {
+                const { latitude, longitude } = p.coords;
+                if (lastPos) {
+                    distance += getDistance(lastPos.lat, lastPos.lon, latitude, longitude);
+                    updateStats();
+                }
+                lastPos = { lat: latitude, lon: longitude };
+            }, e => alert("Please enable GPS"), { enableHighAccuracy: true });
 
-            // Start GPS Tracking
-            watchId = navigator.geolocation.watchPosition(
-                (pos) => {
-                    const { latitude, longitude, accuracy } = pos.coords;
-                    // Ignore low accuracy points (> 30m error)
-                    if (accuracy > 30) return; 
+            // Track Time
+            timerId = setInterval(() => {
+                const diff = Math.floor((Date.now() - startTime) / 1000);
+                const m = Math.floor(diff / 60).toString().padStart(2, '0');
+                const s = (diff % 60).toString().padStart(2, '0');
+                document.getElementById('timeText').innerText = `${m}:${s}`;
+            }, 1000);
 
-                    if (lastCoords) {
-                        const d = getDistance(lastCoords.lat, lastCoords.lng, latitude, longitude);
-                        totalDistance += d;
-                        distDisplay.textContent = totalDistance.toFixed(2);
-                    }
-                    lastCoords = { lat: latitude, lng: longitude };
-                },
-                (err) => { statusDisplay.textContent = "GPS Error"; },
-                { enableHighAccuracy: true, maximumAge: 1000 }
-            );
-        }
-
-        function stopRun() {
-            clearInterval(timerInterval);
+        } else {
+            // Stop Logic
+            isTracking = false;
+            btn.innerText = "Start Session";
+            btn.className = "start";
+            weightInput.disabled = false;
             navigator.geolocation.clearWatch(watchId);
-            startBtn.style.display = 'block';
-            stopBtn.style.display = 'none';
-            statusDisplay.textContent = "Finished";
-            
-            // Haptic feedback (vibration) for Android
-            if (window.navigator.vibrate) window.navigator.vibrate(200);
+            clearInterval(timerId);
+            lastPos = null;
         }
-    </script>
+    });
+</script>
 </body>
 </html>
-
