@@ -3,164 +3,208 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Personalized Run Tracker</title>
+    <title>Floating Camera Cristian M</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; padding: 20px; background: #99ff99; color: #333; --accent: #00e600; }
-        .card { background: rgba(255, 255, 255, 0.1); max-width: 400px; margin: 0 auto; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-bottom: 4px solid var(--accent); }
-        .input-group { background: rgba(255, 255, 255, 0.1); margin-bottom: 20px; text-align: left; }
-        input { background: rgba(255, 255, 255, 0.1); width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
-        .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-        .stat-item { background: rgba(255, 255, 255, 0.1); padding: 15px; border-radius: 10px; }
-        .stat-value { font-size: 1.5em; font-weight: bold; display: block; color: #007bff; }
-        button { width: 100%; padding: 15px; font-size: 1.1em; font-weight: bold; cursor: pointer; border-radius: 8px; border: none; transition: 0.3s; }
-        .start { background: #008000; color: white; }
-        .stop { background: #008000; color: white; }
+        body {
+            font-family: Arial, sans-serif;
+            /* Se integra la imagen del jaguar optimizada en alta calidad directamente en el CSS */
+            background-image: url("Jaguar.png"), url("https://unsplash.com");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        /* Organized Dashboard Container */
+        .dashboard {
+            background-color: rgba(0, 0, 0, 0.55); /* Un poco más oscuro para que resalte frente al fondo del jaguar */
+            backdrop-filter: blur(10px);
+            padding: 25px 35px;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .dashboard-title {
+            color: #ffffff;
+            margin: 0 0 5px 0;
+            font-size: 22px;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.6);
+        }
+
+        /* Buttons organized into a neat horizontal layout */
+        .controls-container {
+            display: flex;
+            gap: 14px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Clean Base Button Styling (Verde y Blanco) */
+        button {
+            width: 55px; 
+            height: 55px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #1e5e2f; /* Verde base elegante */
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%; 
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            transition: all 0.2s ease-in-out;
+            padding: 0; 
+        }
+
+        /* Iconos PNG grandes, limpios y blancos */
+        button img {
+            width: 28px;  
+            height: 28px;
+            object-fit: contain;
+            pointer-events: none; 
+            transition: transform 0.2s ease;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            background-color: #28a745; /* Verde brillante al pasar el mouse */
+            box-shadow: 0 6px 14px rgba(40, 167, 69, 0.4);
+        }
+
+        button:hover img {
+            transform: scale(1.08); /* Reacción al pasar el cursor */
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        /* Variación para estados dinámicos controlados por JS */
+        .btn-danger-state {
+            background-color: #bd2130 !important;
+        }
+        .btn-danger-state:hover {
+            background-color: #dc3545 !important;
+            box-shadow: 0 6px 14px rgba(220, 53, 69, 0.4) !important;
+        }
+
+        /* Video element hidden cleanly for PiP hack */
+        video {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            opacity: 0;
+            pointer-events: none;
+        }
     </style>
 </head>
 <body>
 
+    <!-- Unified UI Container -->
+    <div class="dashboard">
+        <h2 class="dashboard-title">Camera Console</h2>
+        <div class="controls-container">
+            <!-- Empezar Grabación -->
+            <button id="startBtn" title="Empezar Grabación">
+                <img src="record.png" alt="Grabar">
+            </button>
+<button type="button" onclick="window.location.href='https://ffmpeg-online.vercel.app/?inputOptions=-i&output=output.&outputOptions=';" title="convertidor">
+                <img src="conver.png" alt="Subtítulos">
+            </button>
+            <!-- Subtítulos -->
+            <button type="button" onclick="window.location.href='subtitulos.html';" title="Subtítulos">
+                <img src="subtitles.png" alt="Subtítulos">
+            </button>
 
-<div class="card">
-    <h2>Solo Fitness Francisco</h2>
-    <div class="input-group">
-    <input type="text" id="userName" placeholder="Pon tu nombre"
-    </div>
-    
-    <!-- User Input for Weight -->
-    <div class="input-group">
-        <label for="weight">Tu Peso (kg):</label>
-        <input type="number" id="weight" value="70" placeholder="Enter weight in kg">
-    </div>
+            <!-- Recortador -->
+            <button type="button" onclick="window.location.href='Recortador.html';" title="Recortador">
+                <img src="trimmer.png" alt="Recortador">
+            </button>
 
-    <div class="stats">
-        <div class="stat-item">
-            <span class="stat-value" id="distText">0.00</span>
-            <small>KM</small>
-        </div>
-        <div class="stat-item">
-            <span class="stat-value" id="calText">0</span>
-            <small>KCAL</small>
-        </div>
-        <div class="stat-item" style="grid-column: span 2;">
-            <span class="stat-value" id="timeText">00:00</span>
-            <small>DURATION</small>
+            <!-- Cámara / PiP Toggle -->
+            <button class="toggle-btn" id="pipBtn" title="Cámara">
+                <img src="camera.png" alt="camera">
+            </button>
+
+              <button type="button" onclick="window.location.href='recortador.html';" title="Recortador">
+                <img src="image_trimmer.png" alt="Recortador">
+            </button>
+            <!-- Finalizar Grabación -->
+            <button id="stopBtn" title="Finalizar Grabación">
+                <img src="stop.png" alt="Detener">
+            </button>
         </div>
     </div>
 
-    <button onclick="greetMe()" id="mainBtn" class="start">START RUN</button>
-</div>
+    <video id="webcam" autoplay playsinline muted></video>
+
+    <script src="popup.js"></script>
+    <script src="popup4.js"></script>
 
 <script>
-    let isTracking = false;
-    let watchId = null;
-    let distance = 0;
-    let lastPos = null;
-    let startTime = null;
-    let timerId = null;
-   
-    const btn = document.getElementById('mainBtn');
-    const weightInput = document.getElementById('weight');
-    
-    
-    
-     function greetMe() {
-            // 1. Get the value from the input field
-            const name = document.getElementById('userName').value || "Friend";
-            
-            // 2. Create the message
-            
-            
-            const message = `Hola ${name}, Que comience la carrera`;
-            console.log(message);
+    const pipBtn = document.getElementById('pipBtn');
+    const video = document.getElementById('webcam');
+    let stream = null;
 
-            // 3. Create a SpeechSynthesisUtterance object
-            const utterance = new SpeechSynthesisUtterance(message);
+    pipBtn.addEventListener('click', async () => {
+        try {
+            if (document.pictureInPictureElement) {
+                await document.exitPictureInPicture();
+                return; 
+            }
 
-            // 4. Optional: Customize the voice (pitch, rate, etc.)
-            utterance.pitch = 1; // Range: 0 to 2
-            utterance.rate = 1;  // Range: 0.1 to 10
-            utterance.volume = 1; // Range: 0 to 1
+            if (!stream) {
+                stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+                video.srcObject = stream;
+                await video.play();
+            }
 
-            // 5. Tell the computer to speak the message
-            window.speechSynthesis.speak(utterance);
-             greetMe = function() {};
-          
-        }
-       
+            if (document.pictureInPictureEnabled) {
+                await video.requestPictureInPicture();
+            } else {
+                alert("Your browser does not support Picture-in-Picture.");
+            }
 
-function once(fn) {
-    let called = false;
-    return function(...args) {
-        if (!called) {
-            called = true;
-            return fn.apply(this, args);
-        }
-    };
-}
-
-const greetOnce = once(greetMe);
-
-
-       
-
-    // Haversine formula to calculate distance between GPS points
-    function getDistance(lat1, lon1, lat2, lon2) {
-        const R = 6371; // Earth's radius in km
-        const dLat = (lat2 - lat1) * Math.PI / 180;
-        const dLon = (lon2 - lon1) * Math.PI / 180;
-        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                  Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-                  Math.sin(dLon/2) * Math.sin(dLon/2);
-        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-    }
-
-    function updateStats() {
-        const userWeight = parseFloat(weightInput.value) || 70;
-        document.getElementById('distText').innerText = distance.toFixed(2);
-        
-        // Calorie Formula: Distance (km) * Weight (kg) * 1.036
-        const cals = distance * userWeight * 1.036;
-        document.getElementById('calText').innerText = Math.round(cals);
-    }
-
-    btn.addEventListener('click', () => {
-        if (!isTracking) {
-            // Start Logic
-            isTracking = true;
-            btn.innerText = "Stop & Save";
-            btn.className = "stop";
-            weightInput.disabled = true; // Lock weight during run
-            startTime = Date.now();
-
-            // Track GPS
-            watchId = navigator.geolocation.watchPosition(p => {
-                const { latitude, longitude } = p.coords;
-                if (lastPos) {
-                    distance += getDistance(lastPos.lat, lastPos.lon, latitude, longitude);
-                    updateStats();
-                }
-                lastPos = { lat: latitude, lon: longitude };
-            }, e => alert("Please enable GPS"), { enableHighAccuracy: true });
-
-            // Track Time
-            timerId = setInterval(() => {
-                const diff = Math.floor((Date.now() - startTime) / 1000);
-                const m = Math.floor(diff / 60).toString().padStart(2, '0');
-                const s = (diff % 60).toString().padStart(2, '0');
-                document.getElementById('timeText').innerText = `${m}:${s}`;
-            }, 1000);
-
-        } else {
-            // Stop Logic
-            isTracking = false;
-            btn.innerText = "Start Session";
-            btn.className = "start";
-            weightInput.disabled = false;
-            navigator.geolocation.clearWatch(watchId);
-            clearInterval(timerId);
-            lastPos = null;
+        } catch (err) {
+            console.error("Initialization failed:", err);
+            alert("Could not start floating mode. Ensure camera access is allowed.");
+            stopCamera();
         }
     });
+
+    // Dynamic icon updates using local file paths (Fixed)
+    video.addEventListener('leavepictureinpicture', () => {
+        // Restores your original local camera image
+        pipBtn.innerHTML = '<img src="camera.png" alt="Cámara">';
+        pipBtn.classList.remove('btn-danger-state');
+        stopCamera(); 
+    });
+
+    video.addEventListener('enterpictureinpicture', () => {
+        // Keeps the camera image or you can point this to a 'camera_off.png' if you have one
+        pipBtn.innerHTML = '<img src="camera.png" alt="Desactivar Cámara">';
+        pipBtn.classList.add('btn-danger-state'); 
+    });
+
+    function stopCamera() {
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+            video.srcObject = null;
+            stream = null;
+        }
+    }
 </script>
+        
+
 </body>
 </html>
